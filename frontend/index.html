@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Morning Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { terminal: '#4ade80' },
+          fontFamily: { mono: ['JetBrains Mono', 'Fira Code', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'JetBrains Mono', monospace; }
+    .widget { @apply bg-zinc-900 border border-zinc-700 rounded-lg p-4; }
+    .widget-title { @apply text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3; }
+    .status-overdue { @apply text-red-400; }
+    .status-upcoming { @apply text-terminal; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen p-6">
+
+  <!-- Header -->
+  <header class="mb-8">
+    <div class="flex justify-between items-baseline">
+      <h1 class="text-2xl font-semibold text-terminal" id="greeting">Good morning, Adam.</h1>
+      <span class="text-zinc-400 text-sm" id="date-display"></span>
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  <div id="loading" class="text-zinc-500 text-sm">Loading dashboard...</div>
+
+  <!-- Error state -->
+  <div id="error" class="hidden text-red-400 text-sm">Failed to load dashboard data.</div>
+
+  <!-- Dashboard grid -->
+  <main id="dashboard" class="hidden space-y-4">
+
+    <!-- AI Briefing — full width -->
+    <div class="widget">
+      <div class="flex justify-between items-center mb-3">
+        <span class="widget-title mb-0">AI Daily Briefing</span>
+        <span class="text-xs text-zinc-500 border border-zinc-700 rounded px-2 py-0.5">BEDROCK</span>
+      </div>
+      <p id="ai-summary" class="text-zinc-200 leading-relaxed"></p>
+    </div>
+
+    <!-- Row 1: Weather + Hacker News -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div class="widget">
+        <div class="widget-title">Weather — Maryland</div>
+        <div class="flex items-end gap-3 mb-4">
+          <span id="weather-temp" class="text-4xl font-semibold text-terminal"></span>
+          <span id="weather-condition" class="text-zinc-400 pb-1"></span>
+        </div>
+        <div id="weather-forecast" class="space-y-1"></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">Hacker News</div>
+        <ol id="hn-list" class="space-y-2 list-none"></ol>
+      </div>
+
+    </div>
+
+    <!-- Row 2: Dev.to + Steam -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div class="widget">
+        <div class="widget-title">Dev.to</div>
+        <ol id="devto-list" class="space-y-2 list-none"></ol>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">Steam</div>
+        <div id="steam-content"></div>
+      </div>
+
+    </div>
+
+    <!-- Row 3: GitHub + Reminders -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div class="widget">
+        <div class="widget-title">GitHub</div>
+        <div id="github-content"></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">Upcoming Reminders</div>
+        <ul id="reminders-list" class="space-y-2"></ul>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-8 text-zinc-600 text-xs flex justify-between">
+    <span id="last-updated"></span>
+    <span>Powered by AWS Bedrock ·
+      <a href="https://github.com/adobe5062/ai-dashboard" class="text-zinc-500 hover:text-terminal transition-colors">View on GitHub</a>
+    </span>
+  </footer>
+
+<script>
+  const API_URL = '__API_BASE_URL__/dashboard';
+  const MOCK_URL = '../mock/mock-data.json';
+
+  const isMock = API_URL.includes('__API_BASE_URL__');
+
+  function formatDate(d) {
+    return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  function greetingPrefix() {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+
+  function render(data) {
+    document.getElementById('greeting').textContent = `${greetingPrefix()}, Adam.`;
+    document.getElementById('date-display').textContent = formatDate(new Date());
+    document.getElementById('ai-summary').textContent = data.aiSummary;
+
+    // Weather
+    document.getElementById('weather-temp').textContent = `${data.weather.temp}°F`;
+    document.getElementById('weather-condition').textContent = data.weather.condition;
+    document.getElementById('weather-forecast').innerHTML = data.weather.forecast.map(f =>
+      `<div class="flex justify-between text-sm text-zinc-400">
+        <span>${f.day}</span>
+        <span>${f.condition}</span>
+        <span>${f.high}° / ${f.low}°</span>
+      </div>`
+    ).join('');
+
+    // Hacker News
+    document.getElementById('hn-list').innerHTML = data.hackerNews.map((s, i) =>
+      `<li class="text-sm">
+        <a href="${s.url}" target="_blank" rel="noopener" class="text-zinc-200 hover:text-terminal transition-colors">
+          <span class="text-zinc-500 mr-2">${i + 1}.</span>${s.title}
+        </a>
+        <span class="text-zinc-600 text-xs ml-1">${s.points}pts</span>
+      </li>`
+    ).join('');
+
+    // Dev.to
+    document.getElementById('devto-list').innerHTML = data.devTo.map((a, i) =>
+      `<li class="text-sm">
+        <a href="${a.url}" target="_blank" rel="noopener" class="text-zinc-200 hover:text-terminal transition-colors">
+          <span class="text-zinc-500 mr-2">${i + 1}.</span>${a.title}
+        </a>
+      </li>`
+    ).join('');
+
+    // Steam
+    const games = data.steam.recentlyPlayed;
+    document.getElementById('steam-content').innerHTML = games.length
+      ? games.map(g =>
+          `<div>
+            <div class="text-zinc-200">${g.name}</div>
+            <div class="text-zinc-500 text-sm">${g.hoursRecent}h recently · ${g.hoursTotal}h total</div>
+          </div>`
+        ).join('<hr class="border-zinc-800 my-2" />')
+      : `<span class="text-zinc-500 text-sm">No recent activity</span>`;
+
+    // GitHub
+    document.getElementById('github-content').innerHTML =
+      `<div class="text-zinc-400 text-sm mb-3">${data.github.reposActiveYesterday} repo${data.github.reposActiveYesterday !== 1 ? 's' : ''} active yesterday</div>` +
+      data.github.recentCommits.map(c =>
+        `<div class="text-sm mb-1">
+          <span class="text-terminal">${c.repo}</span>
+          <span class="text-zinc-500 mx-1">—</span>
+          <span class="text-zinc-300">${c.message}</span>
+        </div>`
+      ).join('');
+
+    // Reminders
+    document.getElementById('reminders-list').innerHTML = data.reminders.map(r => {
+      const isOverdue = r.status === 'overdue';
+      const icon = isOverdue ? '⚠' : '✓';
+      const cls = isOverdue ? 'status-overdue' : 'status-upcoming';
+      const when = isOverdue
+        ? `${Math.abs(r.daysUntilDue)}d overdue`
+        : r.daysUntilDue <= 30
+          ? `${r.daysUntilDue}d`
+          : new Date(r.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return `<li class="flex justify-between text-sm ${cls}">
+        <span>${icon} ${r.title}</span>
+        <span class="text-zinc-500">${when}</span>
+      </li>`;
+    }).join('');
+
+    // Footer
+    const ts = new Date(data.generatedAt);
+    document.getElementById('last-updated').textContent =
+      `Last updated: ${ts.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${ts.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+  }
+
+  async function load() {
+    try {
+      const url = isMock ? MOCK_URL : API_URL;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      render(data);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('error').classList.remove('hidden');
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>

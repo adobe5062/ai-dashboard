@@ -1,0 +1,30 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+*.DS_Store
+
+# CDK
+cdk.out/
+cdk.context.json
+node_modules/
+
+# Secrets — never commit
+.env
+*.env.local
+appsettings.Development.json
+
+# AWS
+.aws/
+aws-exports.js
+
+# Build artifacts
+publish/
+dist/
+
+# Logs
+*.log
+logs/

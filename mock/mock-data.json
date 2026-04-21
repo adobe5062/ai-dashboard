@@ -1,0 +1,44 @@
+{
+  "date": "2026-04-21",
+  "generatedAt": "2026-04-21T07:02:14Z",
+  "aiSummary": "Overcast and 64°F in Maryland. Three HN threads worth a look. Dev.to has a solid CSS Grid deep dive today. You pushed to dobelweb and ai-dashboard yesterday. Recently played: Return of the Living Dead (2.3 hrs). HVAC filter is overdue — deal with that.",
+  "weather": {
+    "temp": 64,
+    "condition": "Overcast",
+    "humidity": 72,
+    "forecast": [
+      { "day": "Wed", "high": 68, "low": 55, "condition": "Partly Cloudy" },
+      { "day": "Thu", "high": 71, "low": 58, "condition": "Sunny" },
+      { "day": "Fri", "high": 65, "low": 52, "condition": "Rain" }
+    ]
+  },
+  "hackerNews": [
+    { "title": "Distributed systems are hard, and that's OK", "url": "https://news.ycombinator.com", "points": 342 },
+    { "title": ".NET 9 Preview 4 is now available", "url": "https://news.ycombinator.com", "points": 289 },
+    { "title": "Show HN: HTTP server in Rust, 200 lines", "url": "https://news.ycombinator.com", "points": 201 }
+  ],
+  "devTo": [
+    { "title": "CSS Grid: Everything you need to know", "url": "https://dev.to", "tags": ["css", "webdev"] },
+    { "title": "Building accessible forms in 2026", "url": "https://dev.to", "tags": ["accessibility", "html"] },
+    { "title": "Astro vs Next.js: an honest comparison", "url": "https://dev.to", "tags": ["astro", "nextjs"] }
+  ],
+  "github": {
+    "reposActiveYesterday": 2,
+    "recentCommits": [
+      { "repo": "dobelweb", "message": "feat: complete astro migration", "time": "yesterday" },
+      { "repo": "ai-dashboard", "message": "chore: initial project scaffold", "time": "yesterday" }
+    ]
+  },
+  "steam": {
+    "recentlyPlayed": [
+      { "name": "Return of the Living Dead", "hoursRecent": 2.3, "hoursTotal": 14.7 }
+    ]
+  },
+  "reminders": [
+    { "id": "rem_001", "title": "Vehicle oil change", "category": "vehicle", "dueDate": "2026-05-05", "daysUntilDue": 14, "status": "upcoming" },
+    { "id": "rem_002", "title": "HVAC filter replacement", "category": "home", "dueDate": "2026-04-18", "daysUntilDue": -3, "status": "overdue" },
+    { "id": "rem_003", "title": "Annual checkup", "category": "health", "dueDate": "2026-05-15", "daysUntilDue": 24, "status": "upcoming" },
+    { "id": "rem_004", "title": "Renew vehicle registration", "category": "vehicle", "dueDate": "2026-08-01", "daysUntilDue": 102, "status": "upcoming" },
+    { "id": "rem_005", "title": "Refrigerator water filter", "category": "home", "dueDate": "2026-06-10", "daysUntilDue": 50, "status": "upcoming" }
+  ]
+}
