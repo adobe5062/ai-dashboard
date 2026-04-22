@@ -11,6 +11,7 @@ using Amazon.CDK.AWS.S3;
 using Amazon.CDK.AWS.SNS;
 using Amazon.CDK.AWS.StepFunctions;
 using Amazon.CDK.AWS.StepFunctions.Tasks;
+using Amazon.CDK.CustomResources;
 using Constructs;
 using System.Collections.Generic;
 
@@ -198,6 +199,47 @@ namespace Dashboard.Stack
                 AlarmActions = [alertTopic.TopicArn],
                 TreatMissingData = "notBreaching",
             });
+
+            // ── Reminders seeder (runs once on deploy via custom resource) ─
+
+            var reminders = new[]
+            {
+                new { id = "rem_001", title = "Vehicle oil change",       category = "vehicle", dueDate = "2026-05-05", recurring = "every 6 months" },
+                new { id = "rem_002", title = "HVAC filter replacement",  category = "home",    dueDate = "2026-04-18", recurring = "every 3 months" },
+                new { id = "rem_003", title = "Annual checkup",           category = "health",  dueDate = "2026-05-15", recurring = "annually"       },
+                new { id = "rem_004", title = "Renew vehicle registration",category = "vehicle", dueDate = "2026-08-01", recurring = "annually"       },
+                new { id = "rem_005", title = "Refrigerator water filter", category = "home",   dueDate = "2026-06-10", recurring = "every 6 months" },
+            };
+
+            foreach (var r in reminders)
+            {
+                new AwsCustomResource(this, $"Seed-{r.id}", new AwsCustomResourceProps
+                {
+                    OnCreate = new AwsSdkCall
+                    {
+                        Service = "DynamoDB",
+                        Action = "putItem",
+                        Parameters = new Dictionary<string, object>
+                        {
+                            ["TableName"] = StackConfig.RemindersTableName,
+                            ["ConditionExpression"] = "attribute_not_exists(id)",
+                            ["Item"] = new Dictionary<string, object>
+                            {
+                                ["id"]        = new Dictionary<string, string> { ["S"] = r.id },
+                                ["title"]     = new Dictionary<string, string> { ["S"] = r.title },
+                                ["category"]  = new Dictionary<string, string> { ["S"] = r.category },
+                                ["dueDate"]   = new Dictionary<string, string> { ["S"] = r.dueDate },
+                                ["recurring"] = new Dictionary<string, string> { ["S"] = r.recurring },
+                            },
+                        },
+                        PhysicalResourceId = PhysicalResourceId.Of($"seed-reminder-{r.id}"),
+                    },
+                    Policy = AwsCustomResourcePolicy.FromSdkCalls(new SdkCallsPolicyOptions
+                    {
+                        Resources = AwsCustomResourcePolicy.ANY_RESOURCE,
+                    }),
+                });
+            }
 
             // ── Outputs ────────────────────────────────────────────────────
 
