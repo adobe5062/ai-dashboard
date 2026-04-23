@@ -4,10 +4,45 @@
 @inject IConfiguration Config
 @using System.Text.Json
 
-<div style="display:flex;height:100vh;overflow:hidden;">
+<div class="flex flex-col md:flex-row" style="height:100dvh;overflow:hidden;">
 
-    <!-- Sidebar -->
-    <nav style="width:215px;background:var(--surf);border-right:1px solid var(--bord);display:flex;flex-direction:column;flex-shrink:0;">
+    <!-- Mobile top bar -->
+    <nav class="flex md:hidden" style="background:var(--surf);border-bottom:1px solid var(--bord);padding:10px 16px;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div class="font-display" style="font-size:18px;font-weight:900;color:var(--amber);letter-spacing:0.01em;">THE DISPATCH</div>
+            <div style="display:flex;align-items:center;gap:5px;">
+                @if (_loading)
+                {
+                    <span class="material-symbols-outlined anim-spin" style="font-size:11px;color:var(--muted);">sync</span>
+                    <span class="lbl">Fetching</span>
+                }
+                else if (!_error && !_isMock)
+                {
+                    <span style="width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 5px var(--green);"></span>
+                    <span class="lbl c-green">Live</span>
+                }
+                else if (!_error && _isMock)
+                {
+                    <span style="width:5px;height:5px;border-radius:50%;background:var(--amber);flex-shrink:0;"></span>
+                    <span class="lbl c-amber">Demo</span>
+                }
+                else
+                {
+                    <span style="width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
+                    <span class="lbl c-red">Error</span>
+                }
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;">
+            <span class="lbl">@_syncLabel</span>
+            <a href="https://github.com/adobe5062/ai-dashboard" target="_blank" rel="noopener" style="display:flex;align-items:center;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--muted);">code</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Desktop sidebar -->
+    <nav class="hidden md:flex" style="width:215px;background:var(--surf);border-right:1px solid var(--bord);flex-direction:column;flex-shrink:0;">
 
         <div style="padding:22px 20px 16px;border-bottom:1px solid var(--bord);">
             <div class="font-display" style="font-size:22px;font-weight:900;color:var(--amber);line-height:1.05;letter-spacing:0.01em;">THE<br/>DISPATCH</div>
