@@ -88,7 +88,7 @@
         </div>
 
         <footer style="display:flex;justify-content:space-between;align-items:center;padding:8px 16px;border-top:1px solid var(--bord);flex-shrink:0;">
-            <span class="lbl">© 2026 Adam Dobell</span>
+            <span class="lbl">@(string.IsNullOrEmpty(Config["DisplayName"]) ? "© 2026" : $"© 2026 {Config["DisplayName"]}")</span>
             <a href="https://github.com/adobe5062/ai-dashboard" target="_blank" rel="noopener"
                class="lbl story-link" style="text-decoration:none;">GitHub</a>
         </footer>
@@ -135,10 +135,13 @@
         }
     }
 
-    private static string BuildGreeting()
+    private string BuildGreeting()
     {
         var h      = DateTime.Now.Hour;
         var prefix = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
-        return $"{prefix}, Adam — {DateTime.Now:ddd MMM d}";
+        var name   = Config["DisplayName"];
+        return string.IsNullOrEmpty(name)
+            ? $"{prefix} — {DateTime.Now:ddd MMM d}"
+            : $"{prefix}, {name} — {DateTime.Now:ddd MMM d}";
     }
 }
