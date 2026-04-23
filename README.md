@@ -4,9 +4,7 @@ A serverless morning briefing dashboard that aggregates personal data feeds and 
 
 Built entirely in the .NET ecosystem: three AWS Lambda functions in C#, infrastructure as code with AWS CDK, and a Blazor WebAssembly frontend.
 
-**[Live Demo](#)** · **[Portfolio](https://dobelweb.dev)**
-
-> Open `?mock` to see all features without hitting the live API.
+**[Live Demo](https://my-ai-dash.netlify.app/)** · **[Portfolio](https://dobelweb.dev)**
 
 ---
 
@@ -214,9 +212,9 @@ Running continuously, this costs approximately **$0–$2/month**:
 
 ---
 
-## Roadmap / Personal Fork
+## Roadmap
 
-This repo is intentionally demo-safe — no personal credentials, no private calendar data, no write-back to external services. A private fork extends it with:
+Live API endpoint excluded from demo — mock data only on the public site. Planned additions:
 
 **Google Calendar integration**
 Reads today and tomorrow's events into the briefing context. Claude can then reason about your actual schedule alongside reminders and GitHub activity: *"Heavy meeting day ahead, two overdue reminders, and no commits yet this week — block time this afternoon before it's gone."*
