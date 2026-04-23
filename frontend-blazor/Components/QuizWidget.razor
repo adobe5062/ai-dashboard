@@ -1,0 +1,32 @@
+<div class="col-span-12 card">
+    <div class="card-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--amber);">psychology</span>
+            <span class="lbl">Daily Challenge</span>
+        </div>
+        <span class="lbl">Claude Haiku 4.5</span>
+    </div>
+    <div style="padding:14px 16px;">
+        <div style="font-size:12.5px;line-height:1.75;color:var(--text);">
+            @MarkdownHelper.Render(Question)
+        </div>
+        @if (!_revealed)
+        {
+            <button @onclick="() => _revealed = true" class="btn-reveal" style="margin-top:14px;">
+                Reveal Answer
+            </button>
+        }
+        else
+        {
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bord);font-size:12px;line-height:1.75;color:#B0A898;">
+                @MarkdownHelper.Render(Answer)
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Question { get; set; } = "";
+    [Parameter] public string Answer   { get; set; } = "";
+    private bool _revealed;
+}

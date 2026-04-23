@@ -10,16 +10,17 @@ public class SummaryService
     private readonly IAmazonDynamoDB _dynamo;
     private readonly string _table;
 
+    private static readonly JsonSerializerOptions CaseInsensitive = new() { PropertyNameCaseInsensitive = true };
+
     public SummaryService(IAmazonDynamoDB dynamo)
     {
         _dynamo = dynamo;
-        _table = Environment.GetEnvironmentVariable("SUMMARIES_TABLE")!;
+        _table  = Environment.GetEnvironmentVariable("SUMMARIES_TABLE")!;
     }
 
     public async Task<DashboardRecord?> GetLatestAsync()
     {
-        // Try today first, fall back to yesterday
-        var today = DateTime.UtcNow.ToString("yyyy-MM-dd");
+        var today     = DateTime.UtcNow.ToString("yyyy-MM-dd");
         var yesterday = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
 
         foreach (var date in new[] { today, yesterday })
@@ -27,19 +28,11 @@ public class SummaryService
             var result = await _dynamo.GetItemAsync(new GetItemRequest
             {
                 TableName = _table,
-                Key = new Dictionary<string, AttributeValue>
-                {
-                    ["date"] = new() { S = date }
-                },
+                Key       = new Dictionary<string, AttributeValue> { ["date"] = new() { S = date } },
             });
 
             if (result.Item.Count > 0 && result.Item.TryGetValue("payload", out var payload))
-            {
-                return JsonSerializer.Deserialize<DashboardRecord>(payload.S, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                });
-            }
+                return JsonSerializer.Deserialize<DashboardRecord>(payload.S, CaseInsensitive);
         }
 
         return null;

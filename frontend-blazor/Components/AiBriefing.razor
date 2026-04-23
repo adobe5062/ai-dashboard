@@ -1,0 +1,16 @@
+<div class="col-span-12 card card-accent">
+    <div class="card-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--amber);">auto_awesome</span>
+            <span class="lbl">Intel Brief</span>
+        </div>
+        <span class="lbl">Claude Haiku 4.5</span>
+    </div>
+    <div style="padding:14px 16px;font-size:12.5px;line-height:1.75;color:var(--text);">
+        @MarkdownHelper.Render(Summary)
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Summary { get; set; } = "";
+}

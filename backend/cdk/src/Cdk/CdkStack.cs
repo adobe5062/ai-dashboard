@@ -7,6 +7,7 @@ using Amazon.CDK.AWS.Events;
 using Amazon.CDK.AWS.Events.Targets;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
+using Amazon.CDK.AWS.Logs;
 using Amazon.CDK.AWS.S3;
 using Amazon.CDK.AWS.SNS;
 using Amazon.CDK.AWS.StepFunctions;
@@ -28,6 +29,15 @@ namespace Dashboard.Stack
                 BucketName = $"{StackConfig.S3BucketName}-{this.Account}",
                 RemovalPolicy = RemovalPolicy.DESTROY,
                 AutoDeleteObjects = true,
+                LifecycleRules = new[]
+                {
+                    new LifecycleRule
+                    {
+                        Id = "delete-raw-after-7-days",
+                        Enabled = true,
+                        Expiration = Duration.Days(7),
+                    }
+                },
             });
 
             var summariesTable = new Table(this, "SummariesTable", new TableProps
@@ -62,6 +72,7 @@ namespace Dashboard.Stack
                 ["SSM_WEATHER_LON"] = StackConfig.SsmWeatherLon,
                 ["SSM_STEAM_KEY"] = StackConfig.SsmSteamKey,
                 ["SSM_STEAM_USER_ID"] = StackConfig.SsmSteamUserId,
+                ["SSM_TMDB_KEY"] = StackConfig.SsmTmdbKey,
             };
 
             // ── Lambda 1: Data Fetcher ─────────────────────────────────────
@@ -71,7 +82,7 @@ namespace Dashboard.Stack
                 FunctionName = "dashboard-data-fetcher",
                 Runtime = Runtime.DOTNET_8,
                 Handler = "Dashboard.DataFetcher::Dashboard.DataFetcher.Function::FunctionHandler",
-                Code = Code.FromAsset("../src/Dashboard.DataFetcher/bin/Release/net9.0/linux-x64/publish"),
+                Code = Code.FromAsset("../src/Dashboard.DataFetcher/bin/Release/net8.0/linux-x64/publish"),
                 Timeout = Duration.Seconds(60),
                 MemorySize = 512,
                 ReservedConcurrentExecutions = StackConfig.LambdaReservedConcurrency,
@@ -92,7 +103,7 @@ namespace Dashboard.Stack
                 FunctionName = "dashboard-summarizer",
                 Runtime = Runtime.DOTNET_8,
                 Handler = "Dashboard.Summarizer::Dashboard.Summarizer.Function::FunctionHandler",
-                Code = Code.FromAsset("../src/Dashboard.Summarizer/bin/Release/net9.0/linux-x64/publish"),
+                Code = Code.FromAsset("../src/Dashboard.Summarizer/bin/Release/net8.0/linux-x64/publish"),
                 Timeout = Duration.Seconds(60),
                 MemorySize = 512,
                 ReservedConcurrentExecutions = StackConfig.LambdaReservedConcurrency,
@@ -101,10 +112,16 @@ namespace Dashboard.Stack
 
             rawDataBucket.GrantRead(summarizerFn);
             summariesTable.GrantWriteData(summarizerFn);
+            remindersTable.GrantReadData(summarizerFn);
             summarizerFn.AddToRolePolicy(new PolicyStatement(new PolicyStatementProps
             {
                 Actions = ["bedrock:InvokeModel"],
-                Resources = [$"arn:aws:bedrock:{StackConfig.BedrockRegion}::foundation-model/{StackConfig.BedrockModelId}"],
+                Resources = ["arn:aws:bedrock:*::foundation-model/*", "arn:aws:bedrock:*:*:inference-profile/*"],
+            }));
+            summarizerFn.AddToRolePolicy(new PolicyStatement(new PolicyStatementProps
+            {
+                Actions = ["aws-marketplace:ViewSubscriptions"],
+                Resources = ["*"],
             }));
 
             // ── Lambda 3: API Reader (read-only) ───────────────────────────
@@ -114,7 +131,7 @@ namespace Dashboard.Stack
                 FunctionName = "dashboard-api-reader",
                 Runtime = Runtime.DOTNET_8,
                 Handler = "Dashboard.ApiReader::Dashboard.ApiReader.Function::FunctionHandler",
-                Code = Code.FromAsset("../src/Dashboard.ApiReader/bin/Release/net9.0/linux-x64/publish"),
+                Code = Code.FromAsset("../src/Dashboard.ApiReader/bin/Release/net8.0/linux-x64/publish"),
                 Timeout = Duration.Seconds(10),
                 MemorySize = 256,
                 ReservedConcurrentExecutions = StackConfig.LambdaReservedConcurrency,
@@ -123,6 +140,26 @@ namespace Dashboard.Stack
 
             summariesTable.GrantReadData(apiReaderFn);
             remindersTable.GrantReadData(apiReaderFn);
+
+            // ── CloudWatch log retention (7 days) ─────────────────────────
+
+            new LogRetention(this, "DataFetcherLogs", new LogRetentionProps
+            {
+                LogGroupName = $"/aws/lambda/{dataFetcherFn.FunctionName}",
+                Retention = RetentionDays.ONE_WEEK,
+            });
+
+            new LogRetention(this, "SummarizerLogs", new LogRetentionProps
+            {
+                LogGroupName = $"/aws/lambda/{summarizerFn.FunctionName}",
+                Retention = RetentionDays.ONE_WEEK,
+            });
+
+            new LogRetention(this, "ApiReaderLogs", new LogRetentionProps
+            {
+                LogGroupName = $"/aws/lambda/{apiReaderFn.FunctionName}",
+                Retention = RetentionDays.ONE_WEEK,
+            });
 
             // ── Step Functions pipeline ────────────────────────────────────
 

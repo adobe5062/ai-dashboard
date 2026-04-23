@@ -1,0 +1,42 @@
+<div class="col-span-12 md:col-span-3 card" style="display:flex;flex-direction:column;">
+    <div class="card-head">
+        <span class="lbl">Conditions</span>
+        <span class="material-symbols-outlined" style="font-size:14px;color:var(--muted);">@WeatherIcon</span>
+    </div>
+    <div style="flex:1;padding:14px;display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div class="font-display" style="font-size:48px;font-weight:900;color:var(--amber);line-height:1;">@Weather.Temp°</div>
+                <span class="material-symbols-outlined" style="font-size:40px;color:var(--amber);">@WeatherIcon</span>
+            </div>
+            <div class="lbl" style="margin-top:5px;letter-spacing:0.1em;">@Weather.Condition</div>
+        </div>
+        <div style="margin-top:14px;border-top:1px solid var(--bord);padding-top:10px;">
+            @foreach (var f in Weather.Forecast)
+            {
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bord);">
+                    <span class="font-code" style="font-size:10px;color:var(--muted);width:28px;">@f.Day</span>
+                    <span class="material-symbols-outlined" style="font-size:13px;color:var(--muted);">@ConditionIcon(f.Condition)</span>
+                    <span class="font-code" style="font-size:10px;color:var(--amber);">@f.High°F</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public WeatherData Weather { get; set; } = new();
+
+    private string WeatherIcon => ConditionIcon(Weather.Condition);
+
+    private static string ConditionIcon(string condition) => condition switch
+    {
+        "Clear"                        => "wb_sunny",
+        "Clouds" or "Partly Cloudy"    => "wb_cloudy",
+        "Rain" or "Drizzle"            => "rainy",
+        "Thunderstorm"                 => "thunderstorm",
+        "Snow"                         => "ac_unit",
+        "Mist" or "Fog" or "Haze"     => "foggy",
+        _                              => "wb_cloudy",
+    };
+}

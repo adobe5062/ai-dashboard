@@ -1,0 +1,33 @@
+<div class="col-span-12 md:col-span-5 card" style="display:flex;flex-direction:column;">
+    <div class="card-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--muted);">terminal</span>
+            <span class="lbl">Git Status</span>
+        </div>
+        <span class="lbl">@Activity.ReposActiveYesterday repo(s)</span>
+    </div>
+    <div class="font-code" style="flex:1;padding:12px 14px;background:var(--base);font-size:11px;line-height:1.75;overflow-y:auto;">
+        @if (Activity.RecentCommits.Count > 0)
+        {
+            @foreach (var c in Activity.RecentCommits)
+            {
+                <div style="display:flex;gap:10px;margin-bottom:2px;">
+                    <span style="color:var(--amber);white-space:nowrap;flex-shrink:0;">[@c.Repo]</span>
+                    <span style="color:var(--text);">@c.Message</span>
+                </div>
+            }
+        }
+        else
+        {
+            <div style="color:var(--muted);">// no commits yesterday</div>
+        }
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--bord);color:var(--muted);">
+            <div>&gt; @Activity.ReposActiveYesterday repo(s) active yesterday</div>
+            <div>&gt; <span class="anim-blink" style="color:var(--amber);">█</span></div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public GitHubActivity Activity { get; set; } = new();
+}

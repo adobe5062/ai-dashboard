@@ -1,0 +1,35 @@
+<div class="col-span-12 md:col-span-4 card" style="display:flex;flex-direction:column;">
+    <div class="card-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--muted);">checklist</span>
+            <span class="lbl">Task Queue</span>
+        </div>
+        <span class="lbl">@Reminders.Count(r => r.Status == "overdue") overdue</span>
+    </div>
+    <ul style="flex:1;margin:0;padding:0;list-style:none;overflow-y:auto;">
+        @foreach (var r in Reminders)
+        {
+            var overdue = r.Status == "overdue";
+            <li class="row-sep" style="display:flex;justify-content:space-between;align-items:start;gap:8px;padding:8px 14px;">
+                <div style="display:flex;align-items:start;gap:7px;min-width:0;">
+                    <span class="font-code" style="font-size:11px;color:@(overdue ? "var(--red)" : "var(--amber-d)");flex-shrink:0;margin-top:1px;">@(overdue ? "!" : "◆")</span>
+                    <span style="font-size:11.5px;color:@(overdue ? "var(--red)" : "var(--text)");line-height:1.4;">@r.Title</span>
+                </div>
+                <span class="font-code" style="font-size:9px;color:@(overdue ? "var(--red)" : "var(--muted)");flex-shrink:0;white-space:nowrap;margin-top:2px;">@GetWhenLabel(r)</span>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter] public List<Reminder> Reminders { get; set; } = [];
+
+    private static string GetWhenLabel(Reminder r)
+    {
+        if (r.Status == "overdue")
+            return $"{Math.Abs(r.DaysUntilDue)}d overdue";
+        if (r.DaysUntilDue <= 30)
+            return $"{r.DaysUntilDue}d";
+        return DateTime.TryParse(r.DueDate, out var d) ? d.ToString("MMM d") : r.DueDate;
+    }
+}

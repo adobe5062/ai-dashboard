@@ -1,0 +1,138 @@
+@page "/"
+@inject NavigationManager Nav
+@inject HttpClient Http
+@inject IConfiguration Config
+@using System.Text.Json
+
+<div style="display:flex;height:100vh;overflow:hidden;">
+
+    <!-- Sidebar -->
+    <nav style="width:215px;background:var(--surf);border-right:1px solid var(--bord);display:flex;flex-direction:column;flex-shrink:0;">
+
+        <div style="padding:22px 20px 16px;border-bottom:1px solid var(--bord);">
+            <div class="font-display" style="font-size:22px;font-weight:900;color:var(--amber);line-height:1.05;letter-spacing:0.01em;">THE<br/>DISPATCH</div>
+            <div class="lbl" style="margin-top:7px;">Personal AI Daily</div>
+
+            <div style="margin-top:14px;display:flex;align-items:center;gap:7px;">
+                @if (_loading)
+                {
+                    <span class="material-symbols-outlined anim-spin" style="font-size:12px;color:var(--muted);">sync</span>
+                    <span class="lbl">Fetching</span>
+                }
+                else if (!_error)
+                {
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 6px var(--green);"></span>
+                    <span class="lbl c-green">Live</span>
+                }
+                else
+                {
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
+                    <span class="lbl c-red">Error</span>
+                }
+            </div>
+            <div class="lbl" style="margin-top:6px;line-height:1.7;letter-spacing:0.06em;">@_greeting</div>
+        </div>
+
+        <div style="flex:1;padding:6px 0;">
+            <a href="#" class="nav-link active">
+                <span class="material-symbols-outlined" style="font-size:15px;color:var(--amber);">dashboard</span>
+                <span class="lbl c-amber">Dashboard</span>
+            </a>
+            <a href="https://github.com/adobe5062/ai-dashboard" target="_blank" rel="noopener" class="nav-link">
+                <span class="material-symbols-outlined" style="font-size:15px;color:var(--muted);">code</span>
+                <span class="lbl">Source</span>
+            </a>
+        </div>
+
+        <div style="padding:12px 20px;border-top:1px solid var(--bord);">
+            <div class="lbl" style="line-height:1.9;">@_syncLabel</div>
+            <div class="lbl">AWS Bedrock</div>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+
+        @if (_error)
+        {
+            <div class="font-code" style="margin:14px;padding:10px 14px;border:1px solid var(--red);background:rgba(176,58,46,0.07);color:var(--red);font-size:10px;letter-spacing:0.1em;">
+                SYSTEM ERROR — failed to load dashboard data<br/>
+                @if (!string.IsNullOrEmpty(_errorDetail))
+                {
+                    <span style="opacity:0.7;">@_errorDetail</span>
+                }
+            </div>
+        }
+
+        <div style="padding:12px;flex:1;overflow-y:auto;">
+            @if (_data is not null)
+            {
+                <div class="grid grid-cols-12 gap-3">
+                    <AiBriefing Summary="@_data.AiSummary" />
+                    <HackerNewsWidget Items="@_data.HackerNews" />
+                    <DevToWidget Articles="@_data.DevTo" />
+                    <GitHubWidget Activity="@_data.GitHub" />
+                    <RemindersWidget Reminders="@_data.Reminders" />
+                    <WeatherWidget Weather="@_data.Weather" />
+                    <SteamWidget Steam="@_data.Steam" />
+                    <BHorrorWidget Title="@_data.BHorrorTitle" Year="@_data.BHorrorYear"
+                                   Why="@_data.BHorrorWhy" PosterUrl="@_data.BHorrorPosterUrl" />
+                    <QuizWidget Question="@_data.QuizQuestion" Answer="@_data.QuizAnswer" />
+                </div>
+            }
+        </div>
+
+        <footer style="display:flex;justify-content:space-between;align-items:center;padding:8px 16px;border-top:1px solid var(--bord);flex-shrink:0;">
+            <span class="lbl">© 2026 Adam Dobell</span>
+            <a href="https://github.com/adobe5062/ai-dashboard" target="_blank" rel="noopener"
+               class="lbl story-link" style="text-decoration:none;">GitHub</a>
+        </footer>
+
+    </main>
+</div>
+
+@code {
+    private string ApiUrl  => Config["ApiUrl"] ?? "";
+    private const string MockUrl = "mock/mock-data.json";
+
+    private DashboardRecord? _data;
+    private bool _loading = true;
+    private bool _error;
+    private string _errorDetail = "";
+    private string _greeting  = "";
+    private string _syncLabel = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _greeting = BuildGreeting();
+        try
+        {
+            var isMock = Nav.Uri.Contains("mock") || string.IsNullOrEmpty(ApiUrl);
+            var url    = isMock ? MockUrl : ApiUrl;
+            var opts   = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            _data      = await Http.GetFromJsonAsync<DashboardRecord>(url, opts);
+
+            if (_data is not null)
+            {
+                var ts     = DateTime.TryParse(_data.GeneratedAt, out var parsed) ? parsed : DateTime.UtcNow;
+                _syncLabel = $"Sync: {ts.ToLocalTime():MMM d h:mm tt}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = true;
+            _errorDetail = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static string BuildGreeting()
+    {
+        var h      = DateTime.Now.Hour;
+        var prefix = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+        return $"{prefix}, Adam — {DateTime.Now:ddd MMM d}";
+    }
+}

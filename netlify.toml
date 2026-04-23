@@ -1,0 +1,11 @@
+[build]
+  command = "bash build.sh"
+  publish = "frontend-blazor/dist/wwwroot"
+
+[build.environment]
+  DOTNET_VERSION = "8.0"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

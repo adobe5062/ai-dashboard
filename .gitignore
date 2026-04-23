@@ -28,3 +28,9 @@ dist/
 # Logs
 *.log
 logs/
+
+# Claude Code session data
+.claude/
+
+# Scratch files
+ai-dash-stich.html

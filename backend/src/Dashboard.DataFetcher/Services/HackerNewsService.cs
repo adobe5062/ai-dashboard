@@ -44,8 +44,9 @@ public class HackerNewsService
                 Points = json["score"]?.GetValue<int>() ?? 0,
             };
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Failed to fetch HN item {id}: {ex.Message}");
             return null;
         }
     }

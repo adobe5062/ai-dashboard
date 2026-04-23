@@ -1,0 +1,47 @@
+<div class="col-span-12 md:col-span-5 card" style="display:flex;flex-direction:column;">
+    <div class="card-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--muted);">sports_esports</span>
+            <span class="lbl">Steam — Recent</span>
+        </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;">
+        @if (Steam.RecentlyPlayed.Count > 0)
+        {
+            @foreach (var g in Steam.RecentlyPlayed)
+            {
+                <div class="row-sep" style="display:flex;align-items:center;gap:11px;padding:9px 14px;">
+                    @if (g.AppId > 0 && !string.IsNullOrEmpty(g.ImgIconUrl))
+                    {
+                        <img src="https://media.steampowered.com/steamcommunity/public/images/apps/@(g.AppId)/@(g.ImgIconUrl).jpg"
+                             alt="" style="width:28px;height:28px;flex-shrink:0;" />
+                    }
+                    else if (g.AppId > 0)
+                    {
+                        <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/@(g.AppId)/library_600x900.jpg"
+                             alt="" style="width:28px;height:28px;flex-shrink:0;object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <span class="material-symbols-outlined" style="font-size:20px;color:var(--muted);width:28px;text-align:center;flex-shrink:0;">sports_esports</span>
+                    }
+                    <div style="min-width:0;flex:1;">
+                        <div style="font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@g.Name</div>
+                        <div style="display:flex;gap:12px;margin-top:2px;">
+                            <span class="font-code" style="font-size:9px;color:var(--amber);">@g.HoursRecent h recent</span>
+                            <span class="font-code" style="font-size:9px;color:var(--muted);">@g.HoursTotal h total</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="lbl" style="padding:16px;">No recent activity</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public SteamActivity Steam { get; set; } = new();
+}

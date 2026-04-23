@@ -5,7 +5,7 @@ namespace Dashboard.Stack
         public const string SummariesTableName = "dashboard-summaries";
         public const string RemindersTableName = "dashboard-reminders";
         public const string S3BucketName = "dashboard-raw-data";
-        public const string BedrockModelId = "anthropic.claude-haiku-20240307-v1:0";
+        public const string BedrockModelId = "us.anthropic.claude-haiku-4-5-20251001-v1:0";
         public const string BedrockRegion = "us-east-1";
         public const string GitHubUsername = "adobe5062";
 
@@ -15,6 +15,7 @@ namespace Dashboard.Stack
         public const string SsmWeatherLon = "/dashboard/openweather/lon";
         public const string SsmSteamKey = "/dashboard/steam/api-key";
         public const string SsmSteamUserId = "/dashboard/steam/user-id";
+        public const string SsmTmdbKey = "/dashboard/tmdb/api-key";
 
         // API Gateway throttling
         public const int ApiRateLimitPerMinute = 60;
