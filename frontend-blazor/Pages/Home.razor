@@ -19,10 +19,15 @@
                     <span class="material-symbols-outlined anim-spin" style="font-size:12px;color:var(--muted);">sync</span>
                     <span class="lbl">Fetching</span>
                 }
-                else if (!_error)
+                else if (!_error && !_isMock)
                 {
                     <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 6px var(--green);"></span>
                     <span class="lbl c-green">Live</span>
+                }
+                else if (!_error && _isMock)
+                {
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></span>
+                    <span class="lbl c-amber">Demo</span>
                 }
                 else
                 {
@@ -98,6 +103,7 @@
     private DashboardRecord? _data;
     private bool _loading = true;
     private bool _error;
+    private bool _isMock;
     private string _errorDetail = "";
     private string _greeting  = "";
     private string _syncLabel = "";
@@ -107,8 +113,8 @@
         _greeting = BuildGreeting();
         try
         {
-            var isMock = Nav.Uri.Contains("mock") || string.IsNullOrEmpty(ApiUrl);
-            var url    = isMock ? MockUrl : ApiUrl;
+            _isMock    = Nav.Uri.Contains("mock") || string.IsNullOrEmpty(ApiUrl);
+            var url    = _isMock ? MockUrl : ApiUrl;
             var opts   = new JsonSerializerOptions(JsonSerializerDefaults.Web);
             _data      = await Http.GetFromJsonAsync<DashboardRecord>(url, opts);
 
