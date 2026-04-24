@@ -1,7 +1,7 @@
 {
   "date": "2026-04-23",
   "generatedAt": "2026-04-23T07:02:14Z",
-  "aiSummary": "**ARTICLES**\n*.NET 9 Preview 4* is worth a look — ships improved Blazor SSR and native AOT improvements directly relevant to your stack. The distributed systems piece on HN today echoes patterns you've hit in the Lambda pipeline.\n\n**INSIGHT**\nTwo repos active yesterday and an overdue HVAC reminder — you're pushing code but the home maintenance backlog is growing. Classic pattern.\n\n**TODAY**\n1. Deal with the HVAC filter — it's 5 days overdue\n2. Review the .NET 9 preview notes before the feature set locks\n3. Oil change is 14 days out, book it now before it becomes another overdue item",
+  "aiSummary": "**ARTICLES**\n*Ask HN: How do you handle long-running Lambda functions?* is directly relevant — your Summarizer has a 60s timeout and Bedrock calls are the likely pressure point as you add integrations. Worth reading before it becomes a real problem. The *DynamoDB single-table design patterns* piece on Dev.to is also timely: your reminders and summaries are in separate tables, which is fine now but worth revisiting if query patterns grow.\n\n**INSIGHT**\nYou shipped the Blazor WASM frontend yesterday — same day *Blazor vs React in 2026* landed on HN at 156 points. You're on the right side of that debate for a .NET-native stack. Meanwhile 5.9h of gaming across three titles in the same window as two active repos suggests evenings are productive on both fronts. The overdue HVAC filter is the only thing breaking the pattern — cloudy and 64°F today means no reason to be outside anyway.\n\n**TODAY**\n1. HVAC filter is 5 days overdue — handle it this morning before the week gets away from you\n2. Skim the Lambda long-running thread before your next Bedrock timeout surfaces in prod\n3. Book the oil change — 12 days sounds like buffer, it isn't",
   "weather": {
     "temp": 64,
     "condition": "Clouds",
@@ -50,6 +50,6 @@
   "quizAnswer": "`Task.WhenAll` returns a `Task` that completes asynchronously — you `await` it and the calling thread is freed. `Task.WaitAll` blocks the calling thread synchronously until all tasks finish.\n\nThe deadlock scenario: in a UI or ASP.NET context with a `SynchronizationContext`, calling `.Result` or `Task.WaitAll` on a task that tries to resume on the same context creates a circular wait — the blocked thread holds the context, the continuation needs the context, nothing moves.\n\n`Task.WhenAll` avoids this entirely because `await` releases the thread. Rule of thumb: never block on async code with `.Result`, `.Wait()`, or `Task.WaitAll` in a context that has a `SynchronizationContext`.",
   "bHorrorTitle": "Hausu",
   "bHorrorYear": "1977",
-  "bHorrorWhy": "Nobuhiko Obayashi's studio-commissioned fever dream — possessed pianos, a cat painting that eats girls, and a chandelier made of severed limbs. No other haunted house film comes close.",
+  "bHorrorWhy": "Nobuhiko Obayashi's studio-commissioned fever dream — a haunted house with a supernatural hunger, possessed pianos, and a colour palette so deliberately artificial that the horror feels genuinely disorienting. Nothing else in the genre looks remotely like it.",
   "bHorrorPosterUrl": "https://image.tmdb.org/t/p/w342/myMnHnG6kxYaQYknnW76VCHBpYT.jpg"
 }
