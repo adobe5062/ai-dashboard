@@ -111,10 +111,11 @@
                     <AiBriefing Summary="@_data.AiSummary" />
                     <HackerNewsWidget Items="@_data.HackerNews" />
                     <DevToWidget Articles="@_data.DevTo" />
-                    <GitHubWidget Activity="@_data.GitHub" />
+                    <CalendarWidget Events="@_data.CalendarEvents" />
                     <RemindersWidget Reminders="@_data.Reminders" />
-                    <WeatherWidget Weather="@_data.Weather" />
-                    <SteamWidget Steam="@_data.Steam" />
+                    <WeatherWidget Weather="@(_data.Weather ?? new())" />
+                    <GitHubWidget Activity="@(_data.GitHub ?? new())" />
+                    <SteamWidget Steam="@(_data.Steam ?? new())" />
                     <BHorrorWidget Title="@_data.BHorrorTitle" Year="@_data.BHorrorYear"
                                    Why="@_data.BHorrorWhy" PosterUrl="@_data.BHorrorPosterUrl" />
                     <QuizWidget Question="@_data.QuizQuestion" Answer="@_data.QuizAnswer" />

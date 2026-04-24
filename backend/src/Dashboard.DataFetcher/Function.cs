@@ -18,6 +18,7 @@ public class Function
     private readonly GitHubService _gitHub;
     private readonly SteamService _steam;
     private readonly TmdbService _tmdb;
+    private readonly GoogleCalendarService _calendar;
     private readonly IAmazonS3 _s3;
 
     public Function()
@@ -30,6 +31,7 @@ public class Function
         _gitHub     = new GitHubService(http);
         _steam      = new SteamService(http, ssm);
         _tmdb       = new TmdbService(http, ssm);
+        _calendar   = new GoogleCalendarService(http, ssm);
         _s3         = new AmazonS3Client();
     }
 
@@ -37,14 +39,15 @@ public class Function
     {
         context.Logger.LogInformation("Starting data fetch");
 
-        var weatherTask    = SafeFetch(_weather.FetchAsync(),        context, "Weather");
-        var hackerNewsTask = SafeFetch(_hackerNews.FetchAsync(),     context, "HackerNews");
-        var devToTask      = SafeFetch(_devTo.FetchAsync(),          context, "DevTo");
-        var gitHubTask     = SafeFetch(_gitHub.FetchAsync(),         context, "GitHub");
-        var steamTask      = SafeFetch(_steam.FetchAsync(),          context, "Steam");
-        var tmdbTask       = SafeFetch(_tmdb.FetchCandidatesAsync(), context, "TMDB");
+        var weatherTask    = SafeFetch(_weather.FetchAsync(),           context, "Weather");
+        var hackerNewsTask = SafeFetch(_hackerNews.FetchAsync(),        context, "HackerNews");
+        var devToTask      = SafeFetch(_devTo.FetchAsync(),             context, "DevTo");
+        var gitHubTask     = SafeFetch(_gitHub.FetchAsync(),            context, "GitHub");
+        var steamTask      = SafeFetch(_steam.FetchAsync(),             context, "Steam");
+        var tmdbTask       = SafeFetch(_tmdb.FetchCandidatesAsync(),    context, "TMDB");
+        var calendarTask   = SafeFetch(_calendar.FetchTodayAsync(),     context, "GoogleCalendar");
 
-        await Task.WhenAll(weatherTask, hackerNewsTask, devToTask, gitHubTask, steamTask, tmdbTask);
+        await Task.WhenAll(weatherTask, hackerNewsTask, devToTask, gitHubTask, steamTask, tmdbTask, calendarTask);
 
         var record = new DashboardRecord
         {
@@ -55,7 +58,8 @@ public class Function
             DevTo                 = await devToTask,
             GitHub                = await gitHubTask,
             Steam                 = await steamTask,
-            TmdbHorrorCandidates  = await tmdbTask ?? [],
+            TmdbHorrorCandidates  = await tmdbTask    ?? [],
+            CalendarEvents        = await calendarTask ?? [],
         };
 
         var bucket = Environment.GetEnvironmentVariable("S3_BUCKET")!;

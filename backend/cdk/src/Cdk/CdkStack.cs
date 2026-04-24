@@ -72,7 +72,10 @@ namespace Dashboard.Stack
                 ["SSM_WEATHER_LON"] = StackConfig.SsmWeatherLon,
                 ["SSM_STEAM_KEY"] = StackConfig.SsmSteamKey,
                 ["SSM_STEAM_USER_ID"] = StackConfig.SsmSteamUserId,
-                ["SSM_TMDB_KEY"] = StackConfig.SsmTmdbKey,
+                ["SSM_TMDB_KEY"]              = StackConfig.SsmTmdbKey,
+                ["SSM_GOOGLE_CLIENT_ID"]     = StackConfig.SsmGoogleClientId,
+                ["SSM_GOOGLE_CLIENT_SECRET"] = StackConfig.SsmGoogleClientSecret,
+                ["SSM_GOOGLE_REFRESH_TOKEN"] = StackConfig.SsmGoogleRefreshToken,
             };
 
             // ── Lambda 1: Data Fetcher ─────────────────────────────────────

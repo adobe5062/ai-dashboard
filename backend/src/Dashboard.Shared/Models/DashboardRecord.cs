@@ -18,4 +18,5 @@ public class DashboardRecord
     public GitHubActivity GitHub { get; set; } = new();
     public SteamActivity Steam { get; set; } = new();
     public List<Reminder> Reminders { get; set; } = [];
+    public List<CalendarEvent> CalendarEvents { get; set; } = [];
 }

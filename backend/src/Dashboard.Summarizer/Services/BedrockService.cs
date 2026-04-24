@@ -148,12 +148,25 @@ public class BedrockService
 
         DATA:
         WEATHER: {FormatWeather(record.Weather)}
+        CALENDAR: {FormatCalendar(record.CalendarEvents)}
         HACKER NEWS: {FormatHackerNews(record.HackerNews)}
         DEV.TO: {FormatDevTo(record.DevTo)}
         GITHUB: {FormatGitHub(record.GitHub)}
         STEAM: {FormatSteam(record.Steam)}
         REMINDERS: {FormatReminders(record.Reminders)}
         """;
+
+    private static string FormatCalendar(List<CalendarEvent>? events) =>
+        events is null or { Count: 0 } ? "none"
+            : string.Join("\n", events.Select(e =>
+                e.IsAllDay
+                    ? $"All day: {e.Title}"
+                    : $"{ParseIsoLocal(e.Start)}–{ParseIsoLocal(e.End)}: {e.Title}{(string.IsNullOrEmpty(e.Location) ? "" : $" @ {e.Location}")}"));
+
+    private static string ParseIsoLocal(string iso) =>
+        DateTime.TryParse(iso, null, System.Globalization.DateTimeStyles.RoundtripKind, out var dt)
+            ? dt.ToLocalTime().ToString("h:mm tt")
+            : iso;
 
     private static string FormatWeather(WeatherData? w) =>
         w is null ? "unavailable" : $"{w.Temp}°F, {w.Condition}, {w.Humidity}% humidity";

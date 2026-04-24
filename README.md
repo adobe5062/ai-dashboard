@@ -10,7 +10,7 @@ Built entirely in the .NET ecosystem: three AWS Lambda functions in C#, infrastr
 
 ## What It Does
 
-Every morning a Step Functions pipeline fetches data from six sources, passes everything to Claude simultaneously, and stores the result. The Blazor frontend reads it on demand from a cached API.
+Every morning a Step Functions pipeline fetches data from seven sources, passes everything to Claude simultaneously, and stores the result. The Blazor frontend reads it on demand from a cached API.
 
 **AI Widgets — Claude Haiku 4.5 via AWS Bedrock**
 
@@ -27,6 +27,7 @@ Every morning a Step Functions pipeline fetches data from six sources, passes ev
 | GitHub | GitHub API — yesterday's commits across repos |
 | Steam | Steam API — recently played with library icons |
 | Weather | OpenWeather API — current + 3-day forecast |
+| Calendar | Google Calendar API — today's events via OAuth refresh token |
 | Task Queue | DynamoDB — reminders sorted by urgency, overdue flagged |
 
 ---
@@ -47,7 +48,8 @@ EventBridge (daily schedule)
 │  · GitHub         │     │                      │     │  Claude Haiku  │
 │  · Steam          │     │  · Daily briefing    │     └────────────────┘
 │  · TMDB           │     │  · Dev challenge     │
-└───────────────────┘     │  · B-horror pick     │
+│  · Google Cal     │     │  · B-horror pick     │
+└───────────────────┘     │                      │
                           └──────────┬───────────┘
                                      │
                           ┌──────────▼───────────┐
@@ -105,6 +107,7 @@ ai-dashboard/
 │   │   ├── SteamWidget.razor
 │   │   ├── BHorrorWidget.razor
 │   │   ├── RemindersWidget.razor
+│   │   ├── CalendarWidget.razor
 │   │   └── QuizWidget.razor
 │   ├── Pages/Home.razor         # Data fetching, layout, loading/error state
 │   ├── Helpers/MarkdownHelper.cs
@@ -144,7 +147,12 @@ aws ssm put-parameter --name "/dashboard/openweather/lon"     --value "YOUR_LON"
 aws ssm put-parameter --name "/dashboard/steam/api-key"       --value "YOUR_KEY" --type SecureString
 aws ssm put-parameter --name "/dashboard/steam/user-id"       --value "YOUR_ID"  --type String
 aws ssm put-parameter --name "/dashboard/tmdb/api-key"        --value "YOUR_KEY" --type SecureString
+aws ssm put-parameter --name "/dashboard/google/client-id"     --value "YOUR_ID"  --type SecureString
+aws ssm put-parameter --name "/dashboard/google/client-secret" --value "YOUR_SECRET" --type SecureString
+aws ssm put-parameter --name "/dashboard/google/refresh-token" --value "YOUR_TOKEN"  --type SecureString
 ```
+
+Use `tools/OAuthHelper` to obtain the Google refresh token — run `dotnet run -- <client-id> <client-secret>` and follow the browser flow.
 
 Build and deploy:
 ```bash
@@ -215,9 +223,6 @@ Running continuously, this costs approximately **$0–$2/month**:
 ## Roadmap
 
 Live API endpoint excluded from demo — mock data only on the public site. Planned additions:
-
-**Google Calendar integration**
-Reads today and tomorrow's events into the briefing context. Claude can then reason about your actual schedule alongside reminders and GitHub activity: *"Heavy meeting day ahead, two overdue reminders, and no commits yet this week — block time this afternoon before it's gone."*
 
 **Calendar write-back**
 Add events directly from the dashboard via a small form component → `POST /events` endpoint → Lambda writes to Google Calendar API using a stored OAuth refresh token.
