@@ -16,6 +16,7 @@ namespace Dashboard.Stack
         public const string SsmSteamKey = "/dashboard/steam/api-key";
         public const string SsmSteamUserId = "/dashboard/steam/user-id";
         public const string SsmTmdbKey = "/dashboard/tmdb/api-key";
+        public const string SsmGitHubToken        = "/dashboard/github/token";
         public const string SsmGoogleClientId     = "/dashboard/google/client-id";
         public const string SsmGoogleClientSecret = "/dashboard/google/client-secret";
         public const string SsmGoogleRefreshToken = "/dashboard/google/refresh-token";

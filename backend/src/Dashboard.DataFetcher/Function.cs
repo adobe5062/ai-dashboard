@@ -28,7 +28,7 @@ public class Function
         _weather    = new WeatherService(http, ssm);
         _hackerNews = new HackerNewsService(http);
         _devTo      = new DevToService(http);
-        _gitHub     = new GitHubService(http);
+        _gitHub     = new GitHubService(http, ssm);
         _steam      = new SteamService(http, ssm);
         _tmdb       = new TmdbService(http, ssm);
         _calendar   = new GoogleCalendarService(http, ssm);

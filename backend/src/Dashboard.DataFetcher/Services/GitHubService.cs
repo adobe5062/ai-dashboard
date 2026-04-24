@@ -1,4 +1,6 @@
+using Amazon.SimpleSystemsManagement;
 using Dashboard.Shared.Models;
+using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
 
 namespace Dashboard.DataFetcher.Services;
@@ -6,20 +8,27 @@ namespace Dashboard.DataFetcher.Services;
 public class GitHubService
 {
     private readonly HttpClient _http;
+    private readonly IAmazonSimpleSystemsManagement _ssm;
     private readonly string _username;
 
-    public GitHubService(HttpClient http)
+    public GitHubService(HttpClient http, IAmazonSimpleSystemsManagement ssm)
     {
-        _http = http;
+        _http     = http;
+        _ssm      = ssm;
         _username = Environment.GetEnvironmentVariable("GITHUB_USERNAME") ?? "adobe5062";
     }
 
     public async Task<GitHubActivity> FetchAsync()
     {
-        var url = $"https://api.github.com/users/{_username}/events/public?per_page=30";
+        var tokenParam = Environment.GetEnvironmentVariable("SSM_GITHUB_TOKEN");
+        var token      = string.IsNullOrEmpty(tokenParam) ? null : await _ssm.GetDecryptedAsync(tokenParam);
+
+        var url     = $"https://api.github.com/users/{_username}/events?per_page=30";
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "ai-dashboard/1.0");
         request.Headers.Add("Accept", "application/vnd.github+json");
+        if (!string.IsNullOrEmpty(token))
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         var response = await _http.SendAsync(request);
         response.EnsureSuccessStatusCode();
