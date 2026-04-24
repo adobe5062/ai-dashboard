@@ -23,7 +23,8 @@
     { "title": "Step Functions vs EventBridge Pipes: when to use each", "url": "https://dev.to", "tags": ["aws", "serverless", "architecture"] },
     { "title": "Building accessible forms with Blazor", "url": "https://dev.to", "tags": ["blazor", "accessibility", "dotnet"] },
     { "title": "DynamoDB single-table design patterns", "url": "https://dev.to", "tags": ["aws", "dynamodb", "database"] },
-    { "title": "Async/await pitfalls every .NET developer should know", "url": "https://dev.to", "tags": ["dotnet", "csharp", "async"] }
+    { "title": "Async/await pitfalls every .NET developer should know", "url": "https://dev.to", "tags": ["dotnet", "csharp", "async"] },
+    { "title": "Practical API versioning in ASP.NET Core", "url": "https://dev.to", "tags": ["dotnet", "api", "webdev"] }
   ],
   "github": {
     "reposActiveYesterday": 2,

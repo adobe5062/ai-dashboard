@@ -12,24 +12,39 @@ public class DevToService
 
     public async Task<List<DevToArticle>> FetchAsync()
     {
-        var url = $"https://dev.to/api/articles?tag=webdev&top=1&per_page={ArticleCount}";
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("User-Agent", "ai-dashboard/1.0");
+        var tags    = new[] { "dotnet", "aws", "csharp", "webdev", "blazor" };
+        var fetched = new List<DevToArticle>();
+        var seen    = new HashSet<string>();
 
-        var response = await _http.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        foreach (var tag in tags)
+        {
+            if (fetched.Count >= ArticleCount) break;
 
-        var json = JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
+            var url     = $"https://dev.to/api/articles?tag={tag}&top=1&per_page=3";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "ai-dashboard/1.0");
 
-        return json.AsArray()
-            .Select(a => new DevToArticle
+            var response = await _http.SendAsync(request);
+            if (!response.IsSuccessStatusCode) continue;
+
+            var json = JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
+            foreach (var a in json.AsArray())
             {
-                Title = a!["title"]?.GetValue<string>() ?? "",
-                Url = a["url"]?.GetValue<string>() ?? "https://dev.to",
-                Tags = a["tag_list"]?.AsArray()
-                    .Select(t => t!.GetValue<string>())
-                    .ToList() ?? [],
-            })
-            .ToList();
+                if (fetched.Count >= ArticleCount) break;
+                var title = a!["title"]?.GetValue<string>() ?? "";
+                if (!seen.Add(title)) continue;
+
+                fetched.Add(new DevToArticle
+                {
+                    Title = title,
+                    Url   = a["url"]?.GetValue<string>() ?? "https://dev.to",
+                    Tags  = a["tag_list"]?.AsArray()
+                               .Select(t => t!.GetValue<string>())
+                               .ToList() ?? [],
+                });
+            }
+        }
+
+        return fetched;
     }
 }
