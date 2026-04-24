@@ -1,35 +1,35 @@
 {
   "date": "2026-04-23",
   "generatedAt": "2026-04-23T07:02:14Z",
-  "aiSummary": "**ARTICLES**\n*Step Functions vs EventBridge Pipes* on Dev.to is worth skimming before your 11:00 architecture review — directly relevant if pipeline orchestration comes up.\n\n**INSIGHT**\nYou have standup at 9:00, architecture review at 11:00, oil change at 2:00, and a 1:1 at 3:30 — your afternoon is gone. The only open block is 9:15–11:00. HVAC filter is 5 days overdue and there's nothing on the calendar for it; oil change is handled today but HVAC has no owner. Yesterday you logged 5.9h of gaming and rebuilt all three Lambdas — the architecture review is the morning after a late night with fresh context you probably want to have sharp.\n\n**TODAY**\n1. HVAC filter — 5 days overdue, no calendar slot, and your afternoon is booked solid. Order it or schedule it in the 9:15 window before the day gets away.\n2. 9:15–11:00 is your only real block — protect it from Slack.\n3. Oil change at 2:00 is set. Leave by 1:45.",
+  "aiSummary": "**ARTICLES**\n*Ask HN: How do you handle long-running Lambda functions?* — skim it before your 11:00 architecture review. You fixed an async deadlock in the Summarizer Lambda last night; this thread has the tradeoffs you'll need to articulate.\n\n**INSIGHT**\nThree sources line up this morning: you fixed a Lambda async deadlock last night, the top Lambda thread on HN is the same class of problem, and you have an architecture review on serverless limits at 11:00. Today's quiz is `Task.WhenAll` vs `Task.WaitAll` deadlocks — the exact bug you just shipped a fix for. You are not going into that review cold. Your afternoon is fully booked after noon: architecture review, oil change, 1:1 back to back. HVAC filter is 5 days overdue with nothing on the calendar — oil change is handled, HVAC has no owner.\n\n**TODAY**\n1. HVAC filter — 5 days overdue, unscheduled, and your afternoon is gone. The 9:15 window is the last real chance before it slips another week.\n2. 9:15–11:00 is your prep block for the architecture review — you have the context from last night, don't let Slack take it.\n3. Oil change at 2:00. Leave by 1:45.",
   "weather": {
     "temp": 64,
     "condition": "Clouds",
     "humidity": 72,
     "forecast": [
-      { "day": "Wed", "high": 68, "low": 55, "condition": "Partly Cloudy" },
-      { "day": "Thu", "high": 71, "low": 58, "condition": "Clear" },
-      { "day": "Fri", "high": 65, "low": 52, "condition": "Rain" }
+      { "day": "Thu", "high": 68, "low": 55, "condition": "Partly Cloudy" },
+      { "day": "Fri", "high": 71, "low": 58, "condition": "Clear" },
+      { "day": "Sat", "high": 65, "low": 52, "condition": "Rain" }
     ]
   },
   "hackerNews": [
-    { "title": "Distributed systems are hard, and that's OK", "url": "https://news.ycombinator.com", "points": 342 },
-    { "title": ".NET 9 Preview 4 is now available", "url": "https://news.ycombinator.com", "points": 289 },
-    { "title": "Show HN: HTTP server in Rust, 200 lines", "url": "https://news.ycombinator.com", "points": 201 },
+    { "title": "AWS Lambda cold starts: what actually matters in 2026", "url": "https://news.ycombinator.com", "points": 341 },
+    { "title": ".NET 9 Preview 4 is now available", "url": "https://news.ycombinator.com", "points": 287 },
+    { "title": "Show HN: I rewrote my backend in Rust and it made zero difference", "url": "https://news.ycombinator.com", "points": 203 },
     { "title": "Ask HN: How do you handle long-running Lambda functions?", "url": "https://news.ycombinator.com", "points": 178 },
     { "title": "Blazor vs React in 2026: a realistic comparison", "url": "https://news.ycombinator.com", "points": 156 }
   ],
   "devTo": [
-    { "title": "CSS Grid: Everything you need to know in 2026", "url": "https://dev.to", "tags": ["css", "webdev", "layout"] },
+    { "title": "Step Functions vs EventBridge Pipes: when to use each", "url": "https://dev.to", "tags": ["aws", "serverless", "architecture"] },
     { "title": "Building accessible forms with Blazor", "url": "https://dev.to", "tags": ["blazor", "accessibility", "dotnet"] },
     { "title": "DynamoDB single-table design patterns", "url": "https://dev.to", "tags": ["aws", "dynamodb", "database"] },
-    { "title": "Step Functions vs EventBridge Pipes", "url": "https://dev.to", "tags": ["aws", "serverless"] }
+    { "title": "Async/await pitfalls every .NET developer should know", "url": "https://dev.to", "tags": ["dotnet", "csharp", "async"] }
   ],
   "github": {
     "reposActiveYesterday": 2,
     "recentCommits": [
-      { "repo": "ai-dashboard", "message": "feat: add Blazor WASM frontend", "time": "yesterday" },
-      { "repo": "ai-dashboard", "message": "fix: rebuild all Lambdas after Shared model change", "time": "yesterday" }
+      { "repo": "ai-dashboard", "message": "fix: resolve async deadlock in Bedrock Summarizer on Lambda cold start", "time": "yesterday" },
+      { "repo": "ai-dashboard", "message": "feat: add Google Calendar integration to DataFetcher", "time": "yesterday" }
     ]
   },
   "steam": {
