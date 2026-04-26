@@ -1,31 +1,34 @@
 <div class="col-span-12 md:col-span-5 card" style="display:flex;flex-direction:column;">
-    <div class="widget-header">
-        <span class="material-symbols-outlined" style="font-size:14px;color:var(--pink);">calendar_today</span>
-        <span class="lbl">TODAY'S CALENDAR</span>
+    <div class="card-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:var(--amber);">calendar_today</span>
+            <span class="lbl">Today's Calendar</span>
+        </div>
+        <span class="lbl">@Events?.Count events</span>
     </div>
-    <div style="flex:1;overflow-y:auto;padding:10px 14px;">
+    <div style="flex:1;overflow:hidden;padding:6px 14px;">
         @if (Events is null or { Count: 0 })
         {
-            <div class="lbl" style="opacity:0.5;margin-top:4px;">No events today</div>
+            <div class="lbl" style="opacity:0.5;margin-top:8px;">No events today</div>
         }
         else
         {
             @foreach (var e in Events)
             {
-                <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--bord);">
+                <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--bord);">
                     @if (e.IsAllDay)
                     {
-                        <div class="lbl" style="min-width:64px;text-align:right;color:var(--muted);">ALL DAY</div>
+                        <div class="lbl" style="min-width:56px;text-align:right;color:var(--muted);">ALL DAY</div>
                     }
                     else
                     {
-                        <div class="lbl" style="min-width:64px;text-align:right;color:var(--cyan);white-space:nowrap;">@FormatTime(e.Start)</div>
+                        <div class="lbl" style="min-width:56px;text-align:right;color:var(--amber);white-space:nowrap;">@FormatTime(e.Start)</div>
                     }
                     <div style="flex:1;min-width:0;">
-                        <div class="font-code" style="font-size:11px;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@e.Title</div>
+                        <div class="font-code" style="font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@e.Title</div>
                         @if (!string.IsNullOrEmpty(e.Location))
                         {
-                            <div class="lbl" style="margin-top:2px;opacity:0.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@e.Location</div>
+                            <div class="lbl" style="margin-top:1px;opacity:0.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@e.Location</div>
                         }
                     </div>
                 </div>
