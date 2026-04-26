@@ -1,26 +1,23 @@
-<div class="col-span-12 md:col-span-6 card" style="display:flex;flex-direction:column;max-height:320px;">
+<div class="col-span-12 md:col-span-6 card" style="display:flex;flex-direction:column;">
     <div class="card-head">
         <div style="display:flex;align-items:center;gap:8px;">
             <img src="https://www.google.com/s2/favicons?domain=dev.to&sz=32" alt="DEV" style="width:13px;height:13px;" />
             <span class="lbl">Dev.to</span>
         </div>
     </div>
-    <ol style="flex:1;overflow-y:auto;margin:0;padding:0;list-style:none;">
+    <ol style="flex:1;overflow:hidden;margin:0;padding:0;list-style:none;">
         @for (int i = 0; i < Articles.Count; i++)
         {
             var a   = Articles[i];
             var num = i + 1;
-            <li class="row-sep" style="padding:8px 14px;">
-                <div style="display:flex;align-items:baseline;gap:8px;">
-                    <span class="font-code" style="font-size:10px;color:var(--amber-d);flex-shrink:0;min-width:14px;">@num.</span>
-                    <a href="@a.Url" target="_blank" rel="noopener" class="story-link" style="font-size:11.5px;line-height:1.45;">@a.Title</a>
-                </div>
-                <div style="margin-top:4px;padding-left:22px;display:flex;flex-wrap:wrap;gap:4px;">
-                    @foreach (var tag in a.Tags.Take(3))
-                    {
-                        <span class="tag">@tag</span>
-                    }
-                </div>
+            <li class="row-sep" style="padding:5px 14px;display:flex;align-items:center;gap:8px;">
+                <span class="font-code" style="font-size:10px;color:var(--amber-d);flex-shrink:0;min-width:14px;">@num.</span>
+                <a href="@a.Url" target="_blank" rel="noopener" class="story-link"
+                   style="flex:1;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@a.Title</a>
+                @foreach (var tag in a.Tags.Take(2))
+                {
+                    <span class="tag" style="flex-shrink:0;">@tag</span>
+                }
             </li>
         }
     </ol>

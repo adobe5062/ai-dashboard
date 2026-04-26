@@ -1,23 +1,20 @@
-<div class="col-span-12 md:col-span-6 card" style="display:flex;flex-direction:column;max-height:320px;md:height:260px;">
+<div class="col-span-12 md:col-span-6 card" style="display:flex;flex-direction:column;">
     <div class="card-head">
         <div style="display:flex;align-items:center;gap:8px;">
             <img src="https://news.ycombinator.com/favicon.ico" alt="HN" style="width:13px;height:13px;" />
             <span class="lbl">Hacker News</span>
         </div>
     </div>
-    <ol style="flex:1;overflow-y:auto;margin:0;padding:0;list-style:none;">
+    <ol style="flex:1;overflow:hidden;margin:0;padding:0;list-style:none;">
         @for (int i = 0; i < Items.Count; i++)
         {
             var item = Items[i];
             var num  = i + 1;
-            <li class="row-sep" style="padding:8px 14px;">
-                <div style="display:flex;align-items:baseline;gap:8px;">
-                    <span class="font-code" style="font-size:10px;color:var(--amber-d);flex-shrink:0;min-width:14px;">@num.</span>
-                    <a href="@item.Url" target="_blank" rel="noopener" class="story-link" style="font-size:11.5px;line-height:1.45;">@item.Title</a>
-                </div>
-                <div style="margin-top:3px;padding-left:22px;">
-                    <span class="font-code" style="font-size:9px;color:var(--muted);">@item.Points pts</span>
-                </div>
+            <li class="row-sep" style="padding:5px 14px;display:flex;align-items:center;gap:8px;">
+                <span class="font-code" style="font-size:10px;color:var(--amber-d);flex-shrink:0;min-width:14px;">@num.</span>
+                <a href="@item.Url" target="_blank" rel="noopener" class="story-link"
+                   style="flex:1;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@item.Title</a>
+                <span class="font-code" style="font-size:9px;color:var(--muted);flex-shrink:0;padding-left:6px;">@item.Points pts</span>
             </li>
         }
     </ol>
