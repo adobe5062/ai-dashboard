@@ -24,6 +24,7 @@ aws-exports.js
 # Build artifacts
 publish/
 dist/
+*.zip
 
 # Logs
 *.log

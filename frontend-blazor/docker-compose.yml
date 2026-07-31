@@ -1,0 +1,14 @@
+services:
+  dashboard:
+    build:
+      # Context must be the repo root — Dashboard.Frontend.csproj references
+      # ../backend/src/Dashboard.Shared, which lives outside frontend-blazor/.
+      context: ..
+      dockerfile: frontend-blazor/Dockerfile
+    container_name: ai-dashboard
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    environment:
+      - API_URL=${API_URL:-}
+      - DISPLAY_NAME=${DISPLAY_NAME:-Adam}

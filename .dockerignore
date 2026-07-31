@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+**/.vs/
+**/node_modules/
+cdk.out/
+**/dist/
+**/publish/
+.git/
+*.zip
