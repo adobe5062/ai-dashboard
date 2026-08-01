@@ -214,6 +214,11 @@ namespace Dashboard.Stack
                     // serving the pre-mutation response for up to an hour after a write.
                     // At this traffic level (personal, low-volume) the cache cluster also
                     // cost ~$14.68/mo on its own for essentially no benefit, so it's off.
+                    // NOTE: simply omitting CachingEnabled/CacheTtl did NOT tear down the
+                    // already-provisioned cache cluster on redeploy - CloudFormation left
+                    // the existing stage settings in place. Both flags must be explicit.
+                    CachingEnabled = false,
+                    CacheClusterEnabled = false,
                 },
             });
 
