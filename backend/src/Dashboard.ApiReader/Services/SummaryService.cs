@@ -31,7 +31,7 @@ public class SummaryService
                 Key       = new Dictionary<string, AttributeValue> { ["date"] = new() { S = date } },
             });
 
-            if (result.Item.Count > 0 && result.Item.TryGetValue("payload", out var payload))
+            if (result.Item is { Count: > 0 } && result.Item.TryGetValue("payload", out var payload))
                 return JsonSerializer.Deserialize<DashboardRecord>(payload.S, CaseInsensitive);
         }
 
