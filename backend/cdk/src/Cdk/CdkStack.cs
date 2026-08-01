@@ -209,24 +209,17 @@ namespace Dashboard.Stack
                 {
                     ThrottlingRateLimit = StackConfig.ApiRateLimitPerMinute,
                     ThrottlingBurstLimit = StackConfig.ApiBurstLimit,
-                    CachingEnabled = true,
-                    CacheTtl = Duration.Hours(1),
-                    // Reminders write endpoints must never be served from cache — POST
-                    // /reminders has no per-request cache key, so a cached hit would
-                    // silently no-op every "add task" after the first.
-                    MethodOptions = new Dictionary<string, IMethodDeploymentOptions>
-                    {
-                        ["/reminders/POST"] = new MethodDeploymentOptions { CachingEnabled = false },
-                        ["/reminders/{id}/DELETE"] = new MethodDeploymentOptions { CachingEnabled = false },
-                        ["/reminders/{id}/complete/POST"] = new MethodDeploymentOptions { CachingEnabled = false },
-                    },
+                    // Caching was previously enabled here (1h TTL) but caused completed/
+                    // deleted reminders to reappear on refresh — GET /dashboard would keep
+                    // serving the pre-mutation response for up to an hour after a write.
+                    // At this traffic level (personal, low-volume) the cache cluster also
+                    // cost ~$14.68/mo on its own for essentially no benefit, so it's off.
                 },
             });
 
             var dashboardResource = api.Root.AddResource("dashboard");
             dashboardResource.AddMethod("GET", new LambdaIntegration(apiReaderFn));
 
-            // Reminders write API — caching for these is disabled via DeployOptions.MethodOptions above.
             var remindersResource = api.Root.AddResource("reminders");
             remindersResource.AddMethod("POST", new LambdaIntegration(apiReaderFn));
 

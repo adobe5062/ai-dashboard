@@ -107,7 +107,7 @@ public class Function
         Headers = new Dictionary<string, string>
         {
             ["Content-Type"] = "application/json",
-            ["Cache-Control"] = "max-age=3600",
+            ["Cache-Control"] = "no-store",
             ["Access-Control-Allow-Origin"] = "*",
         },
     };
