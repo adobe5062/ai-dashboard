@@ -1,3 +1,5 @@
+@using Dashboard.Shared.Models
+
 <div class="col-span-12 md:col-span-4 card" style="display:flex;flex-direction:column;">
     <div class="card-head">
         <div style="display:flex;align-items:center;gap:8px;">
@@ -11,18 +13,47 @@
         {
             var overdue = r.Status == "overdue";
             <li class="row-sep" style="display:flex;justify-content:space-between;align-items:start;gap:8px;padding:8px 14px;">
-                <div style="display:flex;align-items:start;gap:7px;min-width:0;">
-                    <span class="font-code" style="font-size:11px;color:@(overdue ? "var(--red)" : "var(--amber-d)");flex-shrink:0;margin-top:1px;">@(overdue ? "!" : "◆")</span>
+                <div style="display:flex;align-items:start;gap:7px;min-width:0;flex:1;">
+                    <button @onclick="() => OnComplete.InvokeAsync(r.Id)" title="Mark done"
+                            style="background:transparent;border:none;padding:0;cursor:pointer;color:@(overdue ? "var(--red)" : "var(--amber-d)");flex-shrink:0;margin-top:1px;font-size:11px;line-height:1.3;">@(overdue ? "!" : "◆")</button>
                     <span style="font-size:11.5px;color:@(overdue ? "var(--red)" : "var(--text)");line-height:1.4;">@r.Title</span>
                 </div>
-                <span class="font-code" style="font-size:9px;color:@(overdue ? "var(--red)" : "var(--muted)");flex-shrink:0;white-space:nowrap;margin-top:2px;">@GetWhenLabel(r)</span>
+                <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
+                    <span class="font-code" style="font-size:9px;color:@(overdue ? "var(--red)" : "var(--muted)");white-space:nowrap;margin-top:2px;">@GetWhenLabel(r)</span>
+                    <button @onclick="() => OnDelete.InvokeAsync(r.Id)" title="Delete"
+                            style="background:transparent;border:none;padding:0 2px;cursor:pointer;color:var(--muted);font-size:13px;line-height:1;">&times;</button>
+                </div>
             </li>
         }
     </ul>
+
+    <form @onsubmit="Submit" style="display:flex;gap:6px;padding:8px 14px;border-top:1px solid var(--bord);flex-shrink:0;">
+        <input @bind="_title" @bind:event="oninput" placeholder="Add task…"
+               style="flex:1;min-width:0;background:var(--surf2);border:1px solid var(--bord);color:var(--text);font-size:10.5px;padding:6px 8px;" />
+        <input @bind="_dueDate" type="date"
+               style="background:var(--surf2);border:1px solid var(--bord);color:var(--text);font-size:10px;padding:6px 4px;width:118px;" />
+        <button type="submit" class="btn-reveal" style="padding:6px 10px;" disabled="@(string.IsNullOrWhiteSpace(_title) || _dueDate is null)">+</button>
+    </form>
 </div>
 
 @code {
     [Parameter] public List<Reminder> Reminders { get; set; } = [];
+    [Parameter] public EventCallback<ReminderCreateRequest> OnAdd { get; set; }
+    [Parameter] public EventCallback<string> OnComplete { get; set; }
+    [Parameter] public EventCallback<string> OnDelete { get; set; }
+
+    private string _title = "";
+    private DateOnly? _dueDate;
+
+    private async Task Submit()
+    {
+        if (string.IsNullOrWhiteSpace(_title) || _dueDate is null)
+            return;
+
+        await OnAdd.InvokeAsync(new ReminderCreateRequest { Title = _title.Trim(), DueDate = _dueDate.Value.ToString("yyyy-MM-dd") });
+        _title = "";
+        _dueDate = null;
+    }
 
     private static string GetWhenLabel(Reminder r)
     {

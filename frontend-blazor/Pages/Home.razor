@@ -112,7 +112,8 @@
                     <HackerNewsWidget Items="@_data.HackerNews" />
                     <DevToWidget Articles="@_data.DevTo" />
                     <CalendarWidget Events="@_data.CalendarEvents" />
-                    <RemindersWidget Reminders="@_data.Reminders" />
+                    <RemindersWidget Reminders="@_data.Reminders"
+                                      OnAdd="AddReminder" OnComplete="CompleteReminder" OnDelete="DeleteReminder" />
                     <WeatherWidget Weather="@(_data.Weather ?? new())" />
                     <GitHubWidget Activity="@(_data.GitHub ?? new())" />
                     <SteamWidget Steam="@(_data.Steam ?? new())" />
@@ -134,6 +135,7 @@
 
 @code {
     private string ApiUrl  => Config["ApiUrl"] ?? "";
+    private string RemindersUrl => string.IsNullOrEmpty(ApiUrl) ? "" : ApiUrl[..ApiUrl.LastIndexOf('/')] + "/reminders";
     private const string MockUrl = "mock/mock-data.json";
 
     private DashboardRecord? _data;
@@ -179,5 +181,97 @@
         return string.IsNullOrEmpty(name)
             ? $"{prefix} — {DateTime.Now:ddd MMM d}"
             : $"{prefix}, {name} — {DateTime.Now:ddd MMM d}";
+    }
+
+    private async Task AddReminder(ReminderCreateRequest req)
+    {
+        if (_data is null) return;
+
+        if (_isMock)
+        {
+            var today = DateTime.UtcNow.Date;
+            var due   = DateTime.TryParse(req.DueDate, out var d) ? d : today;
+            _data.Reminders.Add(new Reminder
+            {
+                Id = $"rem_{Guid.NewGuid():N}"[..12],
+                Title = req.Title,
+                Category = req.Category,
+                DueDate = req.DueDate,
+                Recurring = req.Recurring,
+                DaysUntilDue = (int)(due - today).TotalDays,
+                Status = due < today ? "overdue" : "upcoming",
+            });
+            _data.Reminders = _data.Reminders.OrderBy(r => r.DaysUntilDue).ToList();
+            return;
+        }
+
+        try
+        {
+            var opts = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            var resp = await Http.PostAsJsonAsync(RemindersUrl, req, opts);
+            if (!resp.IsSuccessStatusCode) return;
+
+            var created = await resp.Content.ReadFromJsonAsync<Reminder>(opts);
+            if (created is not null)
+            {
+                _data.Reminders.Add(created);
+                _data.Reminders = _data.Reminders.OrderBy(r => r.DaysUntilDue).ToList();
+            }
+        }
+        catch { /* best-effort — leave the list unchanged on failure */ }
+    }
+
+    private async Task CompleteReminder(string id)
+    {
+        if (_data is null) return;
+
+        if (_isMock)
+        {
+            _data.Reminders.RemoveAll(r => r.Id == id);
+            return;
+        }
+
+        try
+        {
+            var resp = await Http.PostAsync($"{RemindersUrl}/{id}/complete", null);
+            if (!resp.IsSuccessStatusCode) return;
+
+            var opts   = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            var result = await resp.Content.ReadFromJsonAsync<CompleteResult>(opts);
+            _data.Reminders.RemoveAll(r => r.Id == id);
+            if (result?.Reminder is not null)
+            {
+                _data.Reminders.Add(result.Reminder);
+                _data.Reminders = _data.Reminders.OrderBy(r => r.DaysUntilDue).ToList();
+            }
+        }
+        catch { /* best-effort — leave the list unchanged on failure */ }
+    }
+
+    private async Task DeleteReminder(string id)
+    {
+        if (_data is null) return;
+
+        if (_isMock)
+        {
+            _data.Reminders.RemoveAll(r => r.Id == id);
+            return;
+        }
+
+        try
+        {
+            var resp = await Http.DeleteAsync($"{RemindersUrl}/{id}");
+            if (resp.IsSuccessStatusCode)
+            {
+                _data.Reminders.RemoveAll(r => r.Id == id);
+            }
+        }
+        catch { /* best-effort — leave the list unchanged on failure */ }
+    }
+
+    private class CompleteResult
+    {
+        public bool Deleted { get; set; }
+        public Reminder? Reminder { get; set; }
     }
 }

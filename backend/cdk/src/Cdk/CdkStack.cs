@@ -143,7 +143,7 @@ namespace Dashboard.Stack
             });
 
             summariesTable.GrantReadData(apiReaderFn);
-            remindersTable.GrantReadData(apiReaderFn);
+            remindersTable.GrantReadWriteData(apiReaderFn);
 
             // ── CloudWatch log retention (7 days) ─────────────────────────
 
@@ -211,11 +211,30 @@ namespace Dashboard.Stack
                     ThrottlingBurstLimit = StackConfig.ApiBurstLimit,
                     CachingEnabled = true,
                     CacheTtl = Duration.Hours(1),
+                    // Reminders write endpoints must never be served from cache — POST
+                    // /reminders has no per-request cache key, so a cached hit would
+                    // silently no-op every "add task" after the first.
+                    MethodOptions = new Dictionary<string, IMethodDeploymentOptions>
+                    {
+                        ["/reminders/POST"] = new MethodDeploymentOptions { CachingEnabled = false },
+                        ["/reminders/{id}/DELETE"] = new MethodDeploymentOptions { CachingEnabled = false },
+                        ["/reminders/{id}/complete/POST"] = new MethodDeploymentOptions { CachingEnabled = false },
+                    },
                 },
             });
 
             var dashboardResource = api.Root.AddResource("dashboard");
             dashboardResource.AddMethod("GET", new LambdaIntegration(apiReaderFn));
+
+            // Reminders write API — caching for these is disabled via DeployOptions.MethodOptions above.
+            var remindersResource = api.Root.AddResource("reminders");
+            remindersResource.AddMethod("POST", new LambdaIntegration(apiReaderFn));
+
+            var reminderIdResource = remindersResource.AddResource("{id}");
+            reminderIdResource.AddMethod("DELETE", new LambdaIntegration(apiReaderFn));
+
+            var reminderCompleteResource = reminderIdResource.AddResource("complete");
+            reminderCompleteResource.AddMethod("POST", new LambdaIntegration(apiReaderFn));
 
             // ── CloudWatch spend alert ─────────────────────────────────────
 
